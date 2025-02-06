@@ -1,0 +1,57 @@
+# Usage:
+# docker compose -f docker-compose.yml --profile pacientes up --build
+# docker compose -f docker-compose.yml --profile services-all --profile otel-all --profile zabbix-all down
+
+services:
+  hackathon28.api.pacientes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+      - ASPNETCORE_URLS=http://+:5132
+      - ConsultarServiceUrl=http://fiap.api.consulta:5133
+      - ConnectionString=Host=postgres;Port=5432;Database=Pacientes;Username=postgres;Password=senha123
+      - RABBIT_HOST=rabbitmq
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=Pacientes
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=senha123
+      - JWT_KEY=23f29b7471d79c2001765537dd756cec7ef18f6098789c4d5e26ee1568b8511d6734ccce83e6f776bcd27160805185742d43ad9a347c75d56cbcc5be62beb152
+      - JWT_ISSUER=http://hackathon28.com
+      - JWT_AUDIENCE=http://pacientes.hackathon28.com
+    ports:
+      - 5132:5132
+    networks:
+      hackathon28:
+    profiles:
+      - pacientes
+  
+  postgres:
+    image: postgres:13
+    hostname: postgres
+    environment:
+      POSTGRES_DB: Pacientes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha123
+    ports:
+      - 5432:5432
+    volumes:
+      - hackathon28-pacientes-db-volume:/var/lib/postgresql/data
+    networks:
+      hackathon28:
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - pacientes
+
+networks:
+  hackathon28:
+
+volumes:
+  hackathon28-pacientes-db-volume:
