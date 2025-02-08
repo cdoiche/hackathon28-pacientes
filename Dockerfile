@@ -1,9 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["WebApi.csproj", "."]
-RUN dotnet restore "./WebApi.csproj"
 COPY . .
-WORKDIR "/src/."
+RUN dotnet restore "./WebApi.csproj"
 RUN dotnet build "./WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

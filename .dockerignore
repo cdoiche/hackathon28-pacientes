@@ -21,6 +21,9 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/*.test.cs
+**/*.Tests.cs
+*.csproj.user
 LICENSE
 README.md
 !**/.gitignore
